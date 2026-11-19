@@ -40,6 +40,10 @@ jobs:
         working-directory: frontend
         run: pnpm install --no-frozen-lockfile
 
+      - name: Generate Android icons & splash screen
+        working-directory: frontend
+        run: npx @capacitor/assets generate --android --iconBackgroundColor '#0C121C' --splashBackgroundColor '#0C121C' --splashBackgroundColorDark '#0C121C'
+
       - name: Build web assets & sync Capacitor
         working-directory: frontend
         env:

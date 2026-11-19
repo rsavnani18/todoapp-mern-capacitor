@@ -1,5 +1,8 @@
 # ToDoApp — Full-Stack MERN & Capacitor Cross-Platform Task Manager
 
+[![Live Web App](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://todoapp-mern-capacitor.vercel.app)
+[![Download Android APK](https://img.shields.io/badge/Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/rsavnani18/todoapp-mern-capacitor/releases/latest)
+
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![React 19](https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat-square&logo=vite&logoColor=white)
@@ -12,6 +15,9 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
 
 Most web-based task managers feel like shrunk-down desktop sites when wrapped into a mobile app. **ToDoApp** is built specifically to eliminate that gap—combining a strict TypeScript **MERN** backend with a custom **React 19 + Vanilla CSS** client wrapped in **Capacitor 8** for native Android and iOS builds.
+
+* **Live Web App:** [https://todoapp-mern-capacitor.vercel.app](https://todoapp-mern-capacitor.vercel.app)
+* **Latest Android APK:** [Download from GitHub Releases](https://github.com/rsavnani18/todoapp-mern-capacitor/releases/latest)
 
 ---
 
@@ -29,7 +35,7 @@ Most web-based task managers feel like shrunk-down desktop sites when wrapped in
 
 ### Deployment & CI/CD
 * **Cloud Hosting:** ![Render](https://img.shields.io/badge/-Render-46E3B7?style=flat-square&logo=render&logoColor=black) (Backend API) & ![Vercel](https://img.shields.io/badge/-Vercel-000000?style=flat-square&logo=vercel&logoColor=white) (Web PWA).
-* **Automated APK Releases:** ![GitHub Actions](https://img.shields.io/badge/-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) compiles the Vite bundle, runs `cap sync android`, builds the Gradle APK, and attaches it directly to GitHub Releases on every `v*` tag push.
+* **Automated APK Releases:** ![GitHub Actions](https://img.shields.io/badge/-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) generates adaptive icons via `@capacitor/assets`, compiles the Vite bundle, runs `cap sync android`, builds the Gradle APK, and attaches it directly to GitHub Releases on every `v*` tag push.
 
 ---
 
@@ -61,7 +67,7 @@ todoapp-mern-capacitor/
 ## Quick Start
 
 ### Prerequisites
-* **Node.js** `20+` and **pnpm** `10+`
+* **Node.js** `22+` and **pnpm** `10+`
 * **MongoDB** Atlas URI or local MongoDB instance
 
 ### 1. Clone the Repository
@@ -99,11 +105,11 @@ Native plugin details and WebView rules are documented in [`frontend/README.md`]
 Push a version tag to trigger the GitHub Actions release pipeline:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
-Once the workflow finishes, `ToDoApp-v1.0.0.apk` is published automatically under the **Releases** tab.
+Once the workflow finishes, `ToDoApp-v1.0.2.apk` is published automatically under the [Releases](https://github.com/rsavnani18/todoapp-mern-capacitor/releases) tab.
 
 ---
 
