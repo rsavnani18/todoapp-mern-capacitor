@@ -1,160 +1,217 @@
 import { useState, type FormEvent } from 'react';
 import {
-  CheckCircle2,
+  CheckSquare,
   Eye,
   EyeOff,
   Lock,
   Mail,
+  Moon,
+  Sun,
   User as UserIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { GitHubBadge } from '../components/GitHubBadge';
+import { useTheme } from '../context/ThemeContext';
 import { MathCaptcha } from '../components/MathCaptcha';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { GitHubPill } from '../components/GitHubPill';
+import { cn } from '../lib/cn';
+import { nativeHaptics } from '../services/capacitor';
 
 export function AuthScreen() {
   const { login, register } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const { isDark, toggleTheme } = useTheme();
+
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const [captchaValid, setCaptchaValid] = useState(false);
   const [captchaReset, setCaptchaReset] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
 
-  const switchMode = (loginMode: boolean) => {
-    setIsLogin(loginMode);
+  const switchMode = (next: 'login' | 'register') => {
+    setMode(next);
     setError('');
-    setPassword('');
-    setShowPassword(false);
-    setCaptchaValid(false);
-    setCaptchaReset((prev) => prev + 1);
+    setCaptchaReset((n) => n + 1);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!captchaValid) {
-      setError('Please solve the math captcha correctly.');
+    setError('');
+
+    if (mode === 'register' && name.trim().length < 2) {
+      setError('Name must be at least 2 characters');
       return;
     }
 
-    setError('');
-    setSubmitting(true);
+    if (!captchaValid) {
+      setError('Please solve the security math check correctly');
+      return;
+    }
 
+    setLoading(true);
     try {
-      if (isLogin) {
-        await login(email, password);
+      if (mode === 'login') {
+        await login(email.trim(), password);
       } else {
-        await register(name, email, password);
+        await register(name.trim(), email.trim(), password);
       }
+      nativeHaptics.success();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
-      setCaptchaValid(false);
-      setCaptchaReset((prev) => prev + 1);
+      setCaptchaReset((n) => n + 1);
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-screen">
-      <div className="auth-top-bar">
-        <ThemeToggle />
-      </div>
-
-      <div className="auth-hero">
-        <div className="app-logo-badge">
-          <CheckCircle2 size={32} />
-        </div>
-        <h1>ToDoApp</h1>
-        <p>Personal workspace for your daily goals</p>
-      </div>
-
-      <div className="segmented-control">
+    <div className="flex-1 pt-safe pb-safe px-5 flex flex-col justify-between gap-6">
+      {/* Top Theme Switcher */}
+      <div className="flex justify-end pt-2">
         <button
           type="button"
-          className={isLogin ? 'active' : ''}
-          onClick={() => switchMode(true)}
+          onClick={() => {
+            nativeHaptics.light();
+            toggleTheme();
+          }}
+          aria-label="Toggle theme"
+          className="w-9 h-9 rounded-xl bg-bg-secondary border border-border-subtle text-text-secondary hover:text-accent-text flex items-center justify-center active:scale-95 transition"
         >
-          Sign In
-        </button>
-        <button
-          type="button"
-          className={!isLogin ? 'active' : ''}
-          onClick={() => switchMode(false)}
-        >
-          Create Account
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
       </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        {error && <div className="error-banner">{error}</div>}
-
-        {!isLogin && (
-          <div className="input-group">
-            <UserIcon size={18} className="input-icon" />
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              minLength={2}
-            />
+      {/* Center Auth Form */}
+      <div className="flex flex-col gap-5 my-auto">
+        <div className="text-center">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-accent text-accent-foreground flex items-center justify-center shadow-lg shadow-violet-600/25">
+            <CheckSquare className="w-7 h-7" />
           </div>
-        )}
-
-        <div className="input-group">
-          <Mail size={18} className="input-icon" />
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <h1 className="text-2xl font-extrabold tracking-tight">ToDoApp</h1>
+          <p className="mt-1 text-xs text-text-secondary">
+            Your personal Tasks & Keep-style Notes workspace
+          </p>
         </div>
 
-        <div className="input-group">
-          <Lock size={18} className="input-icon" />
-          <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password (min 6 chars)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="has-right-btn"
-          />
+        {/* Segmented Control */}
+        <div className="grid grid-cols-2 p-1 rounded-2xl bg-bg-secondary border border-border-subtle">
           <button
             type="button"
-            className="eye-btn"
-            onClick={() => setShowPassword((prev) => !prev)}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            onClick={() => switchMode('login')}
+            className={cn(
+              'py-2.5 text-xs font-bold rounded-xl transition',
+              mode === 'login'
+                ? 'bg-accent text-accent-foreground shadow-xs'
+                : 'text-text-secondary'
+            )}
           >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            Sign In
+          </button>
+          <button
+            type="button"
+            onClick={() => switchMode('register')}
+            className={cn(
+              'py-2.5 text-xs font-bold rounded-xl transition',
+              mode === 'register'
+                ? 'bg-accent text-accent-foreground shadow-xs'
+                : 'text-text-secondary'
+            )}
+          >
+            Create Account
           </button>
         </div>
 
-        <MathCaptcha key={captchaReset} onVerifyChange={setCaptchaValid} />
-
-        <button type="submit" className="btn-primary" disabled={submitting}>
-          {submitting ? (
-            <span className="btn-loading">
-              <span className="btn-spinner" />
-              {isLogin ? 'Signing in...' : 'Creating account...'}
-            </span>
-          ) : isLogin ? (
-            'Continue'
-          ) : (
-            'Create Account'
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {error && (
+            <div className="px-3.5 py-2.5 rounded-xl bg-danger-bg border border-danger-border text-danger text-xs font-medium">
+              {error}
+            </div>
           )}
-        </button>
-      </form>
 
-      <GitHubBadge />
+          {mode === 'register' && (
+            <div className="relative flex items-center">
+              <UserIcon className="w-4 h-4 text-text-secondary absolute left-3.5 pointer-events-none" />
+              <input
+                type="text"
+                required
+                maxLength={50}
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full h-12 pl-10 pr-3.5 rounded-xl bg-bg-secondary border border-border-subtle text-sm focus:border-accent outline-none transition"
+              />
+            </div>
+          )}
+
+          <div className="relative flex items-center">
+            <Mail className="w-4 h-4 text-text-secondary absolute left-3.5 pointer-events-none" />
+            <input
+              type="email"
+              required
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full h-12 pl-10 pr-3.5 rounded-xl bg-bg-secondary border border-border-subtle text-sm focus:border-accent outline-none transition"
+            />
+          </div>
+
+          <div className="relative flex items-center">
+            <Lock className="w-4 h-4 text-text-secondary absolute left-3.5 pointer-events-none" />
+            <input
+              type={showPass ? 'text' : 'password'}
+              required
+              minLength={6}
+              placeholder="Password (min 6 characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full h-12 pl-10 pr-11 rounded-xl bg-bg-secondary border border-border-subtle text-sm focus:border-accent outline-none transition"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPass((s) => !s)}
+              aria-label={showPass ? 'Hide password' : 'Show password'}
+              className="w-8 h-8 rounded-lg absolute right-2.5 flex items-center justify-center text-text-secondary hover:text-text-primary"
+            >
+              {showPass ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+
+          <MathCaptcha
+            onVerifyChange={setCaptchaValid}
+            resetTrigger={captchaReset}
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="h-12 mt-1 rounded-xl bg-accent hover:bg-accent-hover text-accent-foreground text-sm font-bold shadow-lg shadow-violet-600/20 active:scale-[0.98] disabled:opacity-60 transition flex items-center justify-center gap-2"
+          >
+            {loading && (
+              <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            )}
+            <span>
+              {loading
+                ? mode === 'login'
+                  ? 'Signing in...'
+                  : 'Creating account...'
+                : mode === 'login'
+                  ? 'Sign In'
+                  : 'Create Account'}
+            </span>
+          </button>
+        </form>
+      </div>
+
+      {/* Footer GitHub Pill */}
+      <div className="pb-2 flex justify-center">
+        <GitHubPill />
+      </div>
     </div>
   );
 }

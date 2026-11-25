@@ -5,42 +5,59 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { native } from '../lib/native';
+import { nativeStatusBar } from '../services/capacitor';
 
-type Theme = 'dark' | 'light';
+type Theme = 'light' | 'dark';
 
-interface ThemeContextType {
+interface ThemeContextValue {
   theme: Theme;
+  isDark: boolean;
   toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+
+const THEME_STORAGE_KEY = 'todoapp_v2_theme';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('todo_theme');
-    return saved === 'light' || saved === 'dark' ? saved : 'dark';
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    return saved === 'dark' ? 'dark' : 'light'; // Default Light Mode
   });
 
+  const isDark = theme === 'dark';
+
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('todo_theme', theme);
-    native.syncStatusBar(theme);
-  }, [theme]);
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+    // Sync browser theme-color meta tag
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', isDark ? '#0b0e14' : '#f8fafc');
+    }
+
+    // Sync native Capacitor status bar icons
+    nativeStatusBar.syncTheme(isDark);
+  }, [theme, isDark]);
 
   const toggleTheme = () => {
-    native.hapticImpact('light');
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, isDark, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme() {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error('useTheme must be used inside ThemeProvider');

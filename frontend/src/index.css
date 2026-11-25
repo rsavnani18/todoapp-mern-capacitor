@@ -1,147 +1,196 @@
-:root,
-[data-theme='dark'] {
-  --bg-outer: #060a10;
-  --bg-app: #0c121c;
-  --bg-card: #131c2b;
-  --bg-input: #172234;
-  --border-subtle: rgba(255, 255, 255, 0.08);
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Default: Clean Professional Light Mode */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  /* Unified Professional Purple Accent */
+  --accent: #6d28d9;
+  --accent-hover: #5b21b6;
+  --accent-text: #6d28d9;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(109, 40, 217, 0.1);
+  --accent-border: rgba(109, 40, 217, 0.25);
+
+  /* Semantic Status Colors */
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.08);
+  --danger-border: rgba(220, 38, 38, 0.25);
+  --warning: #d97706;
+  --warning-bg: rgba(217, 119, 6, 0.12);
+  --success: #059669;
+  --success-bg: rgba(5, 150, 105, 0.12);
+
+  /* Keep-Style Note Card Surfaces (Light) */
+  --note-default: #ffffff;
+  --note-cyan: #ecfeff;
+  --note-purple: #f3e8ff;
+  --note-amber: #fef3c7;
+  --note-emerald: #d1fae5;
+  --note-rose: #ffe4e6;
+  --note-slate: #f1f5f9;
+}
+
+.dark {
+  /* Dark Mode Surfaces */
+  --bg-primary: #0b0e14;
+  --bg-secondary: #131722;
+  --bg-elevated: #1c2230;
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
-  --accent: #06b6d4;
-  --accent-contrast: #041318;
-  --accent-soft: rgba(6, 182, 212, 0.16);
-  --accent-glow: rgba(6, 182, 212, 0.35);
-  --shimmer-base: #162032;
-  --shimmer-highlight: #1f2d46;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.14);
-  --danger-border: rgba(239, 68, 68, 0.45);
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --safe-top: max(env(safe-area-inset-top, 0px), 24px);
-  --safe-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
-}
+  --text-muted: #64748b;
+  --border-subtle: #1e2536;
+  --border-strong: #2e374d;
 
-[data-theme='light'] {
-  --bg-outer: #ece8f6;
-  --bg-app: #f8f7fc;
-  --bg-card: #ffffff;
-  --bg-input: #f1eff9;
-  --border-subtle: rgba(124, 58, 237, 0.13);
-  --text-primary: #181326;
-  --text-secondary: #645c7a;
+  /* Same Professional Purple Brand Accent */
   --accent: #7c3aed;
-  --accent-contrast: #ffffff;
-  --accent-soft: rgba(124, 58, 237, 0.12);
-  --accent-glow: rgba(124, 58, 237, 0.32);
-  --shimmer-base: #ece9f7;
-  --shimmer-highlight: #f6f4fc;
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --danger-bg: rgba(220, 38, 38, 0.09);
-  --danger-border: rgba(220, 38, 38, 0.42);
+  --accent-hover: #6d28d9;
+  --accent-text: #a78bfa;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(124, 58, 237, 0.16);
+  --accent-border: rgba(167, 139, 250, 0.28);
+
+  /* Semantic Status Colors (Dark) */
+  --danger: #f87171;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-border: rgba(239, 68, 68, 0.28);
+  --warning: #fbbf24;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --success: #34d399;
+  --success-bg: rgba(16, 185, 129, 0.15);
+
+  /* Keep-Style Note Card Surfaces (Dark) */
+  --note-default: #131722;
+  --note-cyan: #0c3547;
+  --note-purple: #2b1454;
+  --note-amber: #422006;
+  --note-emerald: #06402b;
+  --note-rose: #48091d;
+  --note-slate: #1e2536;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
 
-html,
-body {
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-  touch-action: pan-x pan-y;
-  overscroll-behavior: none;
-  -webkit-text-size-adjust: 100%;
-  background-color: var(--bg-outer);
-  color: var(--text-primary);
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
-}
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
 
-#root {
-  min-height: 100%;
-  display: flex;
-  justify-content: center;
-}
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-border: var(--danger-border);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
 
-button,
-input,
-textarea {
-  font-family: inherit;
-  color: inherit;
-  touch-action: manipulation;
-}
+  --color-note-default: var(--note-default);
+  --color-note-cyan: var(--note-cyan);
+  --color-note-purple: var(--note-purple);
+  --color-note-amber: var(--note-amber);
+  --color-note-emerald: var(--note-emerald);
+  --color-note-rose: var(--note-rose);
+  --color-note-slate: var(--note-slate);
 
-/* Mobile keyboard focus par auto-zoom rokne ke liye 16px compulsory hai */
-input,
-textarea {
-  font-size: 16px !important;
-  user-select: text;
-  -webkit-user-select: text;
-}
+  --animate-slide-up: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-shimmer: shimmer 1.4s infinite linear;
 
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-}
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0.6;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 
-.app-shell {
-  width: 100%;
-  max-width: 480px;
-  min-height: 100dvh;
-  background-color: var(--bg-app);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-  transition: background-color 0.25s ease;
-}
-
-@media (min-width: 520px) {
-  .app-shell {
-    min-height: calc(100dvh - 32px);
-    margin: 16px 0;
-    border-radius: 28px;
-    border: 1px solid var(--border-subtle);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 }
 
-.center-loader {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: var(--border-subtle);
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100dvh;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    overscroll-behavior-y: none;
+    touch-action: pan-x pan-y;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 9999px;
+  }
 }
 
-.spinner {
-  width: 28px;
-  height: 28px;
-  border: 3px solid var(--border-subtle);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+@utility pt-safe {
+  padding-top: max(env(safe-area-inset-top), 0.75rem);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

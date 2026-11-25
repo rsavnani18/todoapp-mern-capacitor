@@ -6,16 +6,13 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/auth.routes.js";
 import todoRoutes from "./routes/todo.routes.js";
+import noteRoutes from "./routes/note.routes.js";
 
 const app: Application = express();
 
-// Render / Reverse Proxy ke peeche real client IP detect karne ke liye zaroori
 app.set("trust proxy", 1);
-
-// Security Headers
 app.use(helmet());
 
-// Multi-Origin CORS (Vercel + Localhost + Capacitor Android/iOS)
 const envOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .split(",")
   .map((url) => url.trim())
@@ -44,10 +41,9 @@ app.use(
   })
 );
 
-// General API Rate Limiter
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200,
+  windowMs: 15 * 60 * 1000,
+  max: 300,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -56,9 +52,8 @@ const apiLimiter = rateLimit({
   },
 });
 
-// Strict Auth Rate Limiter (Brute-force protection)
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 25,
   standardHeaders: true,
   legacyHeaders: false,
@@ -71,25 +66,24 @@ const authLimiter = rateLimit({
 app.use("/api", apiLimiter);
 app.use("/api/auth", authLimiter);
 
-// Body & Cookie Parsers
-app.use(express.json({ limit: "10kb" }));
+// Notes & checklists ke liye 100kb payload limit
+app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 
-// Health Check Route (Render uptime monitoring ke liye)
 app.get("/api/health", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: "Server is running smoothly",
+    version: "2.0.0",
     environment: process.env.NODE_ENV || "development",
     timestamp: new Date().toISOString(),
   });
 });
 
-// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/todos", todoRoutes);
+app.use("/api/notes", noteRoutes);
 
-// 404 Not Found Handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
@@ -97,7 +91,6 @@ app.use((_req: Request, res: Response) => {
   });
 });
 
-// Global Error Handler
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   const isCorsError = err.message.startsWith("CORS blocked");
   const statusCode = isCorsError ? 403 : 500;

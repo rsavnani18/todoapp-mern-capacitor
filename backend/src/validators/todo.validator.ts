@@ -26,5 +26,5 @@ export const updateTodoSchema = z.object({
     .optional(),
   completed: z.boolean().optional(),
   priority: z.enum(["low", "medium", "high"]).optional(),
-  dueDate: z.coerce.date().nullable().optional(),
+  dueDate: z.union([z.null(), z.coerce.date()]).optional(),
 });
